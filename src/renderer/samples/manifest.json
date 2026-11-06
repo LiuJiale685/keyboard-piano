@@ -1,0 +1,631 @@
+{
+  "source": "Salamander Grand Piano V3",
+  "author": "Alexander Holm (sfz remap: kinwie)",
+  "license": "CC BY 3.0",
+  "url": "https://github.com/sfzinstruments/SalamanderGrandPiano",
+  "format": "flac",
+  "sampleRate": 48000,
+  "velocityLevels": [
+    1,
+    8,
+    16
+  ],
+  "keyboard": [
+    {
+      "midi": 21,
+      "keyName": "A0",
+      "from": "note21",
+      "sample": "A0",
+      "playbackRate": 1
+    },
+    {
+      "midi": 22,
+      "keyName": "A#0",
+      "from": "note21",
+      "sample": "A0",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 23,
+      "keyName": "B0",
+      "from": "note24",
+      "sample": "C1",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 24,
+      "keyName": "C1",
+      "from": "note24",
+      "sample": "C1",
+      "playbackRate": 1
+    },
+    {
+      "midi": 25,
+      "keyName": "C#1",
+      "from": "note24",
+      "sample": "C1",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 26,
+      "keyName": "D1",
+      "from": "note27",
+      "sample": "D#1",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 27,
+      "keyName": "D#1",
+      "from": "note27",
+      "sample": "D#1",
+      "playbackRate": 1
+    },
+    {
+      "midi": 28,
+      "keyName": "E1",
+      "from": "note27",
+      "sample": "D#1",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 29,
+      "keyName": "F1",
+      "from": "note30",
+      "sample": "F#1",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 30,
+      "keyName": "F#1",
+      "from": "note30",
+      "sample": "F#1",
+      "playbackRate": 1
+    },
+    {
+      "midi": 31,
+      "keyName": "G1",
+      "from": "note30",
+      "sample": "F#1",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 32,
+      "keyName": "G#1",
+      "from": "note33",
+      "sample": "A1",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 33,
+      "keyName": "A1",
+      "from": "note33",
+      "sample": "A1",
+      "playbackRate": 1
+    },
+    {
+      "midi": 34,
+      "keyName": "A#1",
+      "from": "note33",
+      "sample": "A1",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 35,
+      "keyName": "B1",
+      "from": "note36",
+      "sample": "C2",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 36,
+      "keyName": "C2",
+      "from": "note36",
+      "sample": "C2",
+      "playbackRate": 1
+    },
+    {
+      "midi": 37,
+      "keyName": "C#2",
+      "from": "note36",
+      "sample": "C2",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 38,
+      "keyName": "D2",
+      "from": "note39",
+      "sample": "D#2",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 39,
+      "keyName": "D#2",
+      "from": "note39",
+      "sample": "D#2",
+      "playbackRate": 1
+    },
+    {
+      "midi": 40,
+      "keyName": "E2",
+      "from": "note39",
+      "sample": "D#2",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 41,
+      "keyName": "F2",
+      "from": "note42",
+      "sample": "F#2",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 42,
+      "keyName": "F#2",
+      "from": "note42",
+      "sample": "F#2",
+      "playbackRate": 1
+    },
+    {
+      "midi": 43,
+      "keyName": "G2",
+      "from": "note42",
+      "sample": "F#2",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 44,
+      "keyName": "G#2",
+      "from": "note45",
+      "sample": "A2",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 45,
+      "keyName": "A2",
+      "from": "note45",
+      "sample": "A2",
+      "playbackRate": 1
+    },
+    {
+      "midi": 46,
+      "keyName": "A#2",
+      "from": "note45",
+      "sample": "A2",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 47,
+      "keyName": "B2",
+      "from": "note48",
+      "sample": "C3",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 48,
+      "keyName": "C3",
+      "from": "note48",
+      "sample": "C3",
+      "playbackRate": 1
+    },
+    {
+      "midi": 49,
+      "keyName": "C#3",
+      "from": "note48",
+      "sample": "C3",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 50,
+      "keyName": "D3",
+      "from": "note51",
+      "sample": "D#3",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 51,
+      "keyName": "D#3",
+      "from": "note51",
+      "sample": "D#3",
+      "playbackRate": 1
+    },
+    {
+      "midi": 52,
+      "keyName": "E3",
+      "from": "note51",
+      "sample": "D#3",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 53,
+      "keyName": "F3",
+      "from": "note54",
+      "sample": "F#3",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 54,
+      "keyName": "F#3",
+      "from": "note54",
+      "sample": "F#3",
+      "playbackRate": 1
+    },
+    {
+      "midi": 55,
+      "keyName": "G3",
+      "from": "note54",
+      "sample": "F#3",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 56,
+      "keyName": "G#3",
+      "from": "note57",
+      "sample": "A3",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 57,
+      "keyName": "A3",
+      "from": "note57",
+      "sample": "A3",
+      "playbackRate": 1
+    },
+    {
+      "midi": 58,
+      "keyName": "A#3",
+      "from": "note57",
+      "sample": "A3",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 59,
+      "keyName": "B3",
+      "from": "note60",
+      "sample": "C4",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 60,
+      "keyName": "C4",
+      "from": "note60",
+      "sample": "C4",
+      "playbackRate": 1
+    },
+    {
+      "midi": 61,
+      "keyName": "C#4",
+      "from": "note60",
+      "sample": "C4",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 62,
+      "keyName": "D4",
+      "from": "note63",
+      "sample": "D#4",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 63,
+      "keyName": "D#4",
+      "from": "note63",
+      "sample": "D#4",
+      "playbackRate": 1
+    },
+    {
+      "midi": 64,
+      "keyName": "E4",
+      "from": "note63",
+      "sample": "D#4",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 65,
+      "keyName": "F4",
+      "from": "note66",
+      "sample": "F#4",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 66,
+      "keyName": "F#4",
+      "from": "note66",
+      "sample": "F#4",
+      "playbackRate": 1
+    },
+    {
+      "midi": 67,
+      "keyName": "G4",
+      "from": "note66",
+      "sample": "F#4",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 68,
+      "keyName": "G#4",
+      "from": "note69",
+      "sample": "A4",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 69,
+      "keyName": "A4",
+      "from": "note69",
+      "sample": "A4",
+      "playbackRate": 1
+    },
+    {
+      "midi": 70,
+      "keyName": "A#4",
+      "from": "note69",
+      "sample": "A4",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 71,
+      "keyName": "B4",
+      "from": "note72",
+      "sample": "C5",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 72,
+      "keyName": "C5",
+      "from": "note72",
+      "sample": "C5",
+      "playbackRate": 1
+    },
+    {
+      "midi": 73,
+      "keyName": "C#5",
+      "from": "note72",
+      "sample": "C5",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 74,
+      "keyName": "D5",
+      "from": "note75",
+      "sample": "D#5",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 75,
+      "keyName": "D#5",
+      "from": "note75",
+      "sample": "D#5",
+      "playbackRate": 1
+    },
+    {
+      "midi": 76,
+      "keyName": "E5",
+      "from": "note75",
+      "sample": "D#5",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 77,
+      "keyName": "F5",
+      "from": "note78",
+      "sample": "F#5",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 78,
+      "keyName": "F#5",
+      "from": "note78",
+      "sample": "F#5",
+      "playbackRate": 1
+    },
+    {
+      "midi": 79,
+      "keyName": "G5",
+      "from": "note78",
+      "sample": "F#5",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 80,
+      "keyName": "G#5",
+      "from": "note81",
+      "sample": "A5",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 81,
+      "keyName": "A5",
+      "from": "note81",
+      "sample": "A5",
+      "playbackRate": 1
+    },
+    {
+      "midi": 82,
+      "keyName": "A#5",
+      "from": "note81",
+      "sample": "A5",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 83,
+      "keyName": "B5",
+      "from": "note84",
+      "sample": "C6",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 84,
+      "keyName": "C6",
+      "from": "note84",
+      "sample": "C6",
+      "playbackRate": 1
+    },
+    {
+      "midi": 85,
+      "keyName": "C#6",
+      "from": "note84",
+      "sample": "C6",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 86,
+      "keyName": "D6",
+      "from": "note87",
+      "sample": "D#6",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 87,
+      "keyName": "D#6",
+      "from": "note87",
+      "sample": "D#6",
+      "playbackRate": 1
+    },
+    {
+      "midi": 88,
+      "keyName": "E6",
+      "from": "note87",
+      "sample": "D#6",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 89,
+      "keyName": "F6",
+      "from": "note90",
+      "sample": "F#6",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 90,
+      "keyName": "F#6",
+      "from": "note90",
+      "sample": "F#6",
+      "playbackRate": 1
+    },
+    {
+      "midi": 91,
+      "keyName": "G6",
+      "from": "note90",
+      "sample": "F#6",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 92,
+      "keyName": "G#6",
+      "from": "note93",
+      "sample": "A6",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 93,
+      "keyName": "A6",
+      "from": "note93",
+      "sample": "A6",
+      "playbackRate": 1
+    },
+    {
+      "midi": 94,
+      "keyName": "A#6",
+      "from": "note93",
+      "sample": "A6",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 95,
+      "keyName": "B6",
+      "from": "note96",
+      "sample": "C7",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 96,
+      "keyName": "C7",
+      "from": "note96",
+      "sample": "C7",
+      "playbackRate": 1
+    },
+    {
+      "midi": 97,
+      "keyName": "C#7",
+      "from": "note96",
+      "sample": "C7",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 98,
+      "keyName": "D7",
+      "from": "note99",
+      "sample": "D#7",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 99,
+      "keyName": "D#7",
+      "from": "note99",
+      "sample": "D#7",
+      "playbackRate": 1
+    },
+    {
+      "midi": 100,
+      "keyName": "E7",
+      "from": "note99",
+      "sample": "D#7",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 101,
+      "keyName": "F7",
+      "from": "note102",
+      "sample": "F#7",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 102,
+      "keyName": "F#7",
+      "from": "note102",
+      "sample": "F#7",
+      "playbackRate": 1
+    },
+    {
+      "midi": 103,
+      "keyName": "G7",
+      "from": "note102",
+      "sample": "F#7",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 104,
+      "keyName": "G#7",
+      "from": "note105",
+      "sample": "A7",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 105,
+      "keyName": "A7",
+      "from": "note105",
+      "sample": "A7",
+      "playbackRate": 1
+    },
+    {
+      "midi": 106,
+      "keyName": "A#7",
+      "from": "note105",
+      "sample": "A7",
+      "playbackRate": 1.05946
+    },
+    {
+      "midi": 107,
+      "keyName": "B7",
+      "from": "note108",
+      "sample": "C8",
+      "playbackRate": 0.94387
+    },
+    {
+      "midi": 108,
+      "keyName": "C8",
+      "from": "note108",
+      "sample": "C8",
+      "playbackRate": 1
+    }
+  ]
+}

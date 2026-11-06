@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>键盘模拟钢琴</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #101418; color: #e8ecf0;
+      font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif; }
+    .root { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+    /* ---- 加载 ---- */
+    #loading { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #101418; z-index: 20; }
+    #loading h1 { font-size: 34px; letter-spacing: 2px; margin-bottom: 12px; }
+    #loading .sub { font-size: 16px; color: #8a95a3; margin-bottom: 40px; }
+    .bar { width: 320px; height: 8px; border-radius: 4px; background: #22272f; margin: 0 auto 14px; overflow: hidden; }
+    .bar i { display: block; height: 100%; width: 0; border-radius: 4px; background: linear-gradient(90deg, #3f6df6, #7aa5ff); transition: width .15s; }
+    #loading .pct { font-size: 14px; color: #8a95a3; }
+    #loading .hint { margin-top: 32px; font-size: 13px; color: #5b6470; }
+    #loading .err { margin-top: 16px; font-size: 14px; color: #e5484d; }
+
+    /* ---- 就绪界面 ---- */
+    /* 三段布局定义见下方「第二批」段落（.stage/.topbar 等） */
+    .kbd { display: inline-block; background: #22272f; border: 1px solid #3a434e; border-bottom-width: 2px;
+      border-radius: 4px; padding: 0 6px; margin: 0 2px; font-size: 11px; }
+
+    /* ---- 儿歌面板 ---- */
+    #songPanel { position: absolute; top: 64px; left: 50%; transform: translateX(-50%); background: #1a2027; border: 1px solid #2c333c;
+      border-radius: 12px; padding: 18px 20px; width: 380px; box-shadow: 0 12px 40px rgba(0,0,0,.5); display: none; z-index: 30; }
+    #songPanel.show { display: block; }
+    #songPanel h2 { font-size: 18px; margin-bottom: 10px; }
+    .song-list { list-style: none; max-height: 300px; overflow-y: auto; }
+    .song-list li { padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 15px; }
+    .song-list li:hover { background: #242b33; }
+    .song-list li.active { background: #3f6df622; color: #7aa5ff; border: 1px solid #3f6df6; }
+    .song-list li .dur { float: right; color: #5b6470; font-size: 12px; }
+    .song-hint { margin-top: 10px; font-size: 12px; color: #5b6470; }
+
+    /* ---- 退出面板 ---- */
+    #exitMask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 99; }
+    #exitMask.show { display: flex; }
+    .card { background: #1a2027; border: 1px solid #2c333c; border-radius: 12px; padding: 28px 40px; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+    .card .t { font-size: 22px; margin-bottom: 24px; }
+    .card .action { display: flex; gap: 16px; justify-content: center; }
+    button { font-size: 16px; padding: 10px 28px; border-radius: 8px; border: 1px solid #3a434e; background: #242b33; color: #e8ecf0; cursor: pointer; }
+    button:hover { background: #2b333d; }
+    button.primary { background: #e5484d; border-color: #e5484d; color: #fff; }
+
+    /* 录音列表面板 */
+    #recPanel { position: absolute; top: 64px; right: 18px; background: #1a2027; border: 1px solid #2c333c; border-radius: 12px;
+      padding: 16px 18px; width: 320px; box-shadow: 0 12px 40px rgba(0,0,0,.5); display: none; z-index: 30; }
+    #recPanel.show { display: block; }
+    #recPanel h2 { font-size: 18px; margin-bottom: 10px; }
+    .rec-list { list-style: none; max-height: 260px; overflow-y: auto; }
+    .rec-list li { padding: 8px 12px; border-radius: 6px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+    .rec-list li:hover { background: #242b33; }
+    .rec-list li .meta { flex: 1; color: #5b6470; font-size: 12px; }
+    .rec-list li button { font-size: 12px; padding: 3px 10px; }
+
+    /* ==================== 第二批：三段布局（顶栏 / 可视化区 / 虚拟键盘） ==================== */
+    .stage { display: none; width: 100%; height: 100%; flex-direction: column; }
+    .stage.show { display: flex; }
+
+    /* 顶栏：品牌 + 模式 chips + 状态 + 功能提示 */
+    .topbar { display: flex; align-items: center; gap: 14px; padding: 8px 18px; background: #151a21;
+      border-bottom: 1px solid #252c35; font-size: 13px; color: #9aa5b4; flex: 0 0 auto; }
+    .topbar .brand { font-size: 15px; color: #e8ecf0; letter-spacing: 1px; }
+    .topbar .dot { width: 8px; height: 8px; border-radius: 50%; background: #4c5866; display: inline-block; margin-right: 6px; }
+    .dot.on { background: #3fb950; box-shadow: 0 0 6px #3fb95088; }
+    .dot.rec { background: #e5484d; box-shadow: 0 0 6px #e5484d88; animation: pulse 1s infinite; }
+    @keyframes pulse { 50% { opacity: .3; } }
+    .topbar .status { flex: 1; }
+
+    /* 模式 chips */
+    .mode-chips { display: flex; gap: 6px; margin-left: 6px; }
+    .mode-chip { padding: 3px 12px; border-radius: 999px; border: 1px solid #3a434e; font-size: 12px;
+      color: #8a95a3; cursor: pointer; background: transparent; letter-spacing: 1px; }
+    .mode-chip:hover { color: #cfd6df; }
+    .mode-chip.active { background: linear-gradient(135deg, #3f6df6, #5b8bff); color: #fff; border-color: transparent;
+      box-shadow: 0 2px 8px #3f6df655; }
+
+    /* 顶栏功能按钮组（P3：原 F1~F12 全部按钮化） */
+    .toolbar { display: flex; align-items: center; gap: 6px; margin-left: 2px; }
+    .tbtn { font-size: 12px; padding: 5px 10px; border-radius: 6px; border: 1px solid #3a434e;
+      background: #1d242d; color: #cfd6df; cursor: pointer; line-height: 1; white-space: nowrap; }
+    .tbtn:hover:not(:disabled) { background: #2b333d; }
+    .tbtn:disabled { opacity: .35; cursor: default; }
+    .tbtn.rec-on { background: #e5484d; border-color: #e5484d; color: #fff; animation: pulse 1s infinite; }
+    .tbtn.play-on { background: #3f6df6; border-color: #5b8bff; color: #fff; }
+    .tbtn.oct { padding: 5px 8px; }
+
+    /* 简谱字幕带（顶栏下方，卡拉OK式） */
+    #subtitleBar { flex: 0 0 auto; height: 44px; padding: 6px 24px; display: none; align-items: center;
+      justify-content: center; gap: 8px; overflow: hidden; background: #131920; border-bottom: 1px solid #252c35; }
+    #subtitleBar.show { display: flex; }
+    .sub-tone { font-size: 20px; line-height: 1; color: #57606d; font-weight: 600; transition: color .12s, transform .12s, opacity .12s;
+      min-width: 18px; text-align: center; }
+    .sub-tone.active { color: #ffd166; transform: scale(1.35); text-shadow: 0 0 12px #ffd16666; }
+
+    /* 可视化区（随模式切换） */
+    #modeStage { flex: 1 1 auto; position: relative; overflow: hidden; }
+
+    /* 底部虚拟键盘容器 */
+    #vkbWrap { flex: 0 0 auto; padding: 10px 14px 14px; background: #0d1117; border-top: 1px solid #252c35; }
+
+    /* ---- 虚拟键盘 ---- */
+    .vkb { position: relative; height: 168px; user-select: none; }
+    .vkb-key { position: absolute; bottom: 0; border-radius: 0 0 6px 6px; cursor: default;
+      transform: translateZ(0); transition: background .05s linear, box-shadow .08s linear, transform .06s linear, filter .05s linear; }
+    .vkb-white { background: linear-gradient(180deg, #f4f6f8, #dfe3e8); border: 1px solid #b9c0ca; border-top: 2px solid #cfd5dd;
+      color: #3a434e; box-shadow: inset 0 -6px 0 #00000014; z-index: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+    .vkb-white .vkb-label { font-size: 11px; color: #7c8694; letter-spacing: 0; margin-bottom: 2px; font-weight: 600; }
+    .vkb-white .vkb-notename { font-size: 9px; color: #aab2bd; margin-bottom: 10px; }
+    .vkb-black { background: linear-gradient(180deg, #0c0f13, #232a33); border: 1px solid #000; border-top-width: 2px;
+      height: 62%; box-shadow: inset 0 -5px 0 #00000066; color: #8a95a3; z-index: 2; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; }
+    .vkb-black .vkb-label { font-size: 10px; color: #cfd6df; margin-top: 6px; font-weight: 600; }
+
+    /* 按下动画：下沉 + 高亮（多复音互不影响，class 切换） */
+    .vkb-key.on { transform: translateY(4px); }
+    .vkb-white.on { background: linear-gradient(180deg, #ffd166, #f5b936); border-color: #c99a24; box-shadow: inset 0 -4px 0 #0000001f, 0 0 14px #ffd16699; color: #5a4300; }
+    .vkb-white.on .vkb-label { color: #5a4300; }
+    .vkb-white.on .vkb-notename { color: #7a5c10; }
+    .vkb-black.on { background: linear-gradient(180deg, #f5b936, #d99a1f); border-color: #a8751a; box-shadow: inset 0 -3px 0 #00000033, 0 0 12px #f5b936aa; color: #3a2c00; }
+    .vkb-black.on .vkb-label { color: #3a2c00; }
+
+    /* 音区窗口外降透明（纯视觉层，P3） */
+    .vkb-key.out-of-region { opacity: .28; filter: saturate(.4); }
+
+    /* 中央 C 徽标 */
+    .vkb-c4 { position: relative; }
+    .vkb-c4badge { position: absolute; top: -22px; left: 50%; transform: translateX(-50%); background: #3f6df6; color: #fff;
+      font-size: 10px; padding: 2px 7px; border-radius: 99px; white-space: nowrap; box-shadow: 0 2px 8px #3f6df666; z-index: 5; }
+    .vkb-c4badge::after { content: ''; position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%);
+      border: 4px solid transparent; border-top-color: #3f6df6; }
+
+    /* 音名气泡（高频轮指时节流合并） */
+    .vkb-bubble { position: absolute; left: 50%; top: -6px; transform: translate(-50%, -100%); background: #3f6df6;
+      color: #fff; font-size: 13px; font-weight: 700; padding: 3px 8px; border-radius: 99px; white-space: nowrap;
+      pointer-events: none; animation: bubbleUp .85s ease-out forwards; z-index: 6; box-shadow: 0 2px 8px #00000055; }
+    @keyframes bubbleUp { 0% { opacity: 0; transform: translate(-50%, -70%); } 18% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -190%); } }
+
+    /* ---- 弹奏模式：气泡天空 ---- */
+    #modeStage.play { background: radial-gradient(1200px 500px at 50% 0%, #1b2431, #101418 65%); }
+    #modeStage.play .play-guide { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;
+      color: #8a95a3; font-size: 15px; letter-spacing: 1px; }
+    #modeStage.play .play-guide .kbd { background: #22272f; border: 1px solid #3a434e; border-bottom-width: 2px; border-radius: 4px; padding: 0 6px; font-size: 12px; }
+    .sky { position: absolute; inset: 0; pointer-events: none; }
+    .sky-bubble { position: absolute; bottom: -40px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; color: #fff; font-size: 12px; font-weight: 700; text-shadow: 0 1px 2px #00000088; opacity: 0;
+      animation: bubbleRise 2.6s ease-out forwards; box-shadow: inset -4px -6px 12px #00000033, 0 4px 12px #00000044; }
+    @keyframes bubbleRise { 0% { opacity: 0; transform: translateY(0) scale(.6); } 12% { opacity: .95; transform: translateY(-40px) scale(1.05); }
+      80% { opacity: .85; } 100% { opacity: 0; transform: translateY(-480px) scale(1.2); } }
+
+    /* ---- 欣赏模式：音符瀑布 + 播放条 ---- */
+    #modeStage.enjoy { background: #101722; }
+    .enjoy-playbar { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center;
+      gap: 12px; background: #1a2027cc; border: 1px solid #2c333c; border-radius: 999px; padding: 6px 16px; z-index: 5;
+      font-size: 13px; color: #cfd6df; backdrop-filter: blur(4px); }
+    .enjoy-playbar .track { width: 260px; height: 5px; border-radius: 3px; background: #2c333c; overflow: hidden; }
+    .enjoy-playbar .track i { display: block; height: 100%; background: linear-gradient(90deg, #3f6df6, #7aa5ff); border-radius: 3px; transition: width .1s linear; }
+    .enjoy-playbar .t-close { color: #8a95a3; cursor: default; }
+    .enjoy-playbar .t-close:hover { color: #e5484d; }
+    .enjoy-waterfall { position: absolute; inset: 64px 8px 8px; overflow: hidden; }
+    .wf-note { position: absolute; top: -60px; display: flex; align-items: center; justify-content: center; border-radius: 6px;
+      font-size: 13px; font-weight: 700; color: #fff; text-shadow: 0 1px 2px #00000066; box-shadow: 0 3px 10px #00000044;
+      transform: translateZ(0); }
+    .wf-note.n-white { background: linear-gradient(180deg, #84a5ff, #3f6df6); }
+    .wf-note.n-black { background: linear-gradient(180deg, #ffb86b, #e08b2d); }
+
+    /* ---- 练谱模式 ---- */
+    #modeStage.practice { background: #0e1622; }
+    .practice-hud { position: absolute; top: 12px; left: 18px; display: flex; gap: 18px; font-size: 15px; color: #cfd6df; z-index: 5; }
+    .practice-hud b { color: #ffd166; }
+    .practice-hud .s { color: #7aa5ff; }
+    .practice-hud .c-bonus { color: #3fb950; }
+    .speed-switch { position: absolute; top: 12px; right: 18px; display: flex; gap: 6px; z-index: 5; }
+    .speed-switch span { padding: 3px 10px; border: 1px solid #3a434e; border-radius: 99px; font-size: 12px; color: #8a95a3; cursor: default; }
+    .speed-switch span.on { background: #3f6df6; color: #fff; border-color: transparent; }
+    .practice-target-line { position: absolute; left: 0; right: 0; top: var(--tline, 72%); border-top: 2px dashed #3f6df688; z-index: 3; }
+    .practice-target-line::after { content: '键盘线'; position: absolute; right: 10px; top: -20px; font-size: 11px; color: #3f6df6aa; }
+    .practice-note { position: absolute; top: -52px; width: 46px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 17px; font-weight: 800; color: #fff; text-shadow: 0 1px 2px #00000099; transition: none; transform: translateZ(0); z-index: 4; }
+    .practice-note.n-down { background: linear-gradient(180deg, #ffd166, #f0a93a); box-shadow: 0 4px 12px #00000055; }
+    .practice-note.n-black { background: linear-gradient(180deg, #5b8bff, #3f6df6); box-shadow: 0 4px 12px #00000055; }
+    .practice-note.hit { background: linear-gradient(180deg, #3fb950, #2c9a3e); }
+    .practice-note.miss { background: #5b6470; opacity: .6; }
+    .practice-screen { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(10,14,18,.86); backdrop-filter: blur(3px); }
+    .practice-screen .stars { font-size: 46px; margin-bottom: 14px; letter-spacing: 8px; }
+    .practice-screen .info { font-size: 16px; color: #cfd6df; line-height: 2; }
+    .practice-screen .info b { color: #ffd166; }
+    .practice-guidance { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; color: #8a95a3; font-size: 15px; }
+    .practice-guidance .hotkey { color: #ffd166; font-size: 13px; }
+
+    /* ---- 挑战模式 ---- */
+    #modeStage.challenge { background: radial-gradient(1000px 560px at 50% 30%, #2a1e33, #14101c 70%); }
+    .ch-hud { position: absolute; top: 14px; left: 18px; font-size: 15px; color: #cfd6df; z-index: 5; display: flex; gap: 18px; }
+    .ch-hud b { color: #ffd166; }
+    .ch-ring { position: absolute; top: 36%; left: 50%; transform: translate(-50%, -50%); width: 120px; height: 120px; z-index: 5; }
+    .ch-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ch-ring .bg { stroke: #343a45; }
+    .ch-ring .fg { stroke: #ffd166; stroke-linecap: round; transition: stroke-dashoffset .08s linear; }
+    .ch-ring .num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 800; color: #ffd166; }
+    .ch-target { position: absolute; top: 70%; left: 50%; transform: translate(-50%, -50%); padding: 18px 26px; border-radius: 14px;
+      background: linear-gradient(160deg, #ffd166, #f0a93a); box-shadow: 0 8px 26px #ffd16644; z-index: 5; color: #5a4300;
+      font-size: 40px; font-weight: 900; animation: chPulse .5s ease-in-out infinite alternate; }
+    .ch-wrap { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 4; }
+    .ch-keys { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+    .ch-key { position: absolute; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #cfd6df;
+      background: #212a36; border: 2px solid #343a45; border-radius: 10px; box-shadow: 0 3px 8px #00000033; }
+    .ch-key.blink { background: #3f6df6; border-color: #7aa5ff; color: #fff; box-shadow: 0 0 18px #3f6df6aa; animation: chBlink .45s linear infinite; }
+    @keyframes chBlink { 50% { opacity: .55; } }
+    @keyframes chPulse { from { transform: translate(-50%, -50%) scale(1); } to { transform: translate(-50%, -50%) scale(1.05); } }
+    .ch-screen { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(10,12,16,.9); backdrop-filter: blur(3px); gap: 8px; }
+    .ch-screen .big { font-size: 40px; font-weight: 800; color: #ffd166; letter-spacing: 2px; }
+    .ch-screen .stars { font-size: 42px; letter-spacing: 8px; margin: 10px 0; }
+    .ch-screen .info { font-size: 16px; color: #cfd6df; }
+    .ch-guidance { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; color: #8a95a3; font-size: 15px; }
+    .ch-guidance .hotkey { color: #ffd166; }
+
+    /* ---- 录音室：钢琴卷帘 ---- */
+    .roll-wrap { position: absolute; inset: 0; display: flex; flex-direction: column; background: #0c1118; z-index: 5; }
+    .roll-main { flex: 1 1 auto; position: relative; overflow: hidden; }
+    .roll-head { flex: 0 0 auto; height: 52px; display: flex; align-items: center; gap: 12px; padding: 0 16px;
+      background: #151a21; border-bottom: 1px solid #252c35; font-size: 14px; color: #cfd6df; }
+    .roll-content { position: absolute; top: 0; bottom: 0; will-change: transform; }
+    .roll-scroll { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; overflow-y: auto; }
+    .roll-lanes { position: relative; }
+    .roll-lane { position: absolute; left: 0; right: 0; background: #161c26; border-bottom: 1px solid #1d242f; }
+    .roll-lane.black { background: #12161f; }
+    .roll-note { position: absolute; height: 16px; border-radius: 3px; background: linear-gradient(180deg, #5b8bff, #3f6df6);
+      box-shadow: 0 1px 3px #00000055; z-index: 2; }
+    .roll-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: #ffd166; box-shadow: 0 0 8px #ffd16688; z-index: 3; pointer-events: none; }
+    .roll-playhead::before { content: '▶'; position: absolute; top: -1px; left: -8px; font-size: 10px; color: #ffd166; }
+    .roll-close { position: absolute; top: 8px; right: 14px; z-index: 6; font-size: 13px; color: #8a95a3; cursor: default;
+      background: #1a2027; border: 1px solid #2c333c; border-radius: 6px; padding: 4px 10px; }
+    .roll-close:hover { color: #e8ecf0; }
+    /* 卷帘播放条（替代瀑布播放条时的进度） */
+    .roll-status { font-size: 12px; color: #8a95a3; }
+  </style>
+</head>
+<body>
+  <div class="root">
+    <!-- 加载层 -->
+    <div id="loading">
+      <h1>🎹 键盘模拟钢琴</h1>
+      <div class="sub">真钢琴音色 加载中…</div>
+      <div class="bar"><i id="bar"></i></div>
+      <div class="pct" id="pct">0%</div>
+      <div class="err" id="loadErr" style="display:none;"></div>
+      <div class="hint">加载完成后即可弹奏 · 退出：Ctrl + Alt + Shift + Q</div>
+    </div>
+
+    <!-- 就绪主界面：三段布局（顶栏 / 可视化区 / 底部虚拟键盘） -->
+    <div id="stage" class="stage">
+      <div class="topbar">
+        <span class="brand">🎹 键盘模拟钢琴</span>
+        <span class="mode-chips" id="modeChips"></span>
+        <span class="toolbar" id="toolbar">
+          <span class="tbtn" id="btnRec" title="开始录音">● 录音</span>
+          <span class="tbtn" id="btnStopRec" title="停止录音并保存" disabled>■ 停止</span>
+          <span class="tbtn" id="btnPlayRec" title="回放最新录音" disabled>▶ 回放</span>
+          <span class="tbtn" id="btnStopPlay" title="停止回放" disabled>■ 停止</span>
+          <span class="tbtn" id="btnSongs" title="打开儿歌面板">🎵 儿歌</span>
+          <span class="tbtn" id="btnPlaySong" title="播放当前选中歌曲" disabled>▶ 播放</span>
+          <span class="tbtn" id="btnStopSong" title="停止播放" disabled>■ 停止</span>
+          <span class="tbtn" title="音量减小">音量 −</span>
+          <span class="tbtn" title="音量增大">音量 +</span>
+          <span class="tbtn oct" id="btnOctDown" title="音区下移一个八度">音区 −</span>
+          <span class="tbtn oct" id="btnOctUp" title="音区上移一个八度">音区 +</span>
+        </span>
+        <span><span id="readyDot" class="dot on"></span><span id="statusText" class="status">就绪，开始弹奏吧！</span></span>
+      </div>
+      <div id="subtitleBar"></div>
+      <div id="modeStage" class="stage-mode play"></div>
+      <div id="vkbWrap"></div>
+    </div>
+
+    <!-- 儿歌面板 -->
+    <div id="songPanel">
+      <h2>🎵 儿歌</h2>
+      <ul class="song-list" id="songList"></ul>
+      <div class="song-hint">↑/↓ 选曲 · Enter 播放 · 顶栏「▶ 播放」开始 · Esc 关闭</div>
+    </div>
+
+    <!-- 录音列表面板 -->
+    <div id="recPanel">
+      <h2>🎹 我的录音</h2>
+      <ul class="rec-list" id="recList"></ul>
+      <div class="song-hint" style="margin-top:10px">顶部「▶ 回放」回放最新 · 录音保存于本机</div>
+    </div>
+
+    <!-- 退出确认面板 -->
+    <div id="exitMask">
+      <div class="card">
+        <div class="t">确认退出？</div>
+        <div class="action">
+          <button id="btnNo">取消</button>
+          <button id="btnYes" class="primary">确认退出</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./audio/sampler.js"></script>
+  <script src="./audio/recorder.js"></script>
+  <script src="./audio/playback.js"></script>
+  <script src="./audio/midi.js"></script>
+  <script src="./keymap/keymap.js"></script>
+  <script src="./keymap/keyboard.js"></script>
+  <script src="./songs/songs.js"></script>
+  <script src="./ui/virtual-keyboard.js"></script>
+  <script src="./ui/mode-manager.js"></script>
+  <script src="./ui/mode-play.js"></script>
+  <script src="./ui/mode-enjoy.js"></script>
+  <script src="./ui/subtitle.js"></script>
+  <script src="./ui/mode-practice.js"></script>
+  <script src="./ui/mode-challenge.js"></script>
+  <script src="./ui/mode-roll.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

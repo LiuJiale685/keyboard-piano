@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>键盘模拟钢琴</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden;
+      background: #101418; color: #e8ecf0;
+      font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+      display: flex; align-items: center; justify-content: center; }
+    .root { text-align: center; }
+    h1 { font-size: 34px; letter-spacing: 2px; margin-bottom: 12px; }
+    .sub { font-size: 16px; color: #8a95a3; margin-bottom: 40px; }
+    .bar { width: 320px; height: 8px; border-radius: 4px; background: #22272f; margin: 0 auto 14px; overflow: hidden; }
+    .bar > i { display: block; height: 100%; width: 0; border-radius: 4px;
+      background: linear-gradient(90deg, #3f6df6, #7aa5ff); transition: width .2s; }
+    .pct { font-size: 14px; color: #8a95a3; }
+    .hint { margin-top: 40px; font-size: 13px; color: #5b6470; }
+  </style>
+</head>
+<body>
+  <div class="root">
+    <h1>🎹 键盘模拟钢琴</h1>
+    <div class="sub">第一批评审骨架（Kiosk + 防退出已生效）</div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="pct" id="pct">加载中…</div>
+    <div class="hint">退出：同时按住 Ctrl + Alt + Shift + Q，再点击「确认退出」</div>
+  </div>
+
+  <!-- 退出确认面板（应用内 UI，FR-06/FR-08） -->
+  <div id="exitMask" style="display:none;">
+    <div class="card">
+      <div class="t">确认退出？</div>
+      <div class="action">
+        <button id="btnNo">取消</button>
+        <button id="btnYes" class="primary">确认退出</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    #exitMask { position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      display: flex; align-items: center; justify-content: center; z-index: 99; }
+    .card { background: #1a2027; border: 1px solid #2c333c; border-radius: 12px;
+      padding: 28px 40px; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+    .card .t { font-size: 22px; margin-bottom: 24px; }
+    .card .action { display: flex; gap: 16px; justify-content: center; }
+    button { font-size: 16px; padding: 10px 28px; border-radius: 8px; border: 1px solid #3a434e;
+      background: #242b33; color: #e8ecf0; cursor: pointer; }
+    button.primary { background: #e5484d; border-color: #e5484d; color: #fff; }
+  </style>
+
+  <script src="./app.js"></script>
+</body>
+</html>

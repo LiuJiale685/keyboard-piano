@@ -1,0 +1,57 @@
+{
+  "name": "keyboard-piano",
+  "version": "0.1.0",
+  "description": "键盘模拟钢琴 EXE 应用（Electron）— 参考 PRD-键盘模拟钢琴.md",
+  "main": "src/main/index.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging",
+    "dist": "set ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/&& electron-builder --win --publish never",
+    "dist:clean": "set ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/&& electron-builder --win --publish never --config.directories.output=dist"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "com.kidspiano.keyboard",
+    "productName": "键盘模拟钢琴",
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json",
+      "!src/renderer/samples"
+    ],
+    "extraResources": [
+      {
+        "from": "src/renderer/samples",
+        "to": "samples"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "键盘模拟钢琴"
+    }
+  },
+  "dependencies": {
+    "@fainthit/uiohook-napi-suppress": "^1.6.4"
+  }
+}
